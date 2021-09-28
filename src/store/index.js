@@ -1,12 +1,34 @@
-import { createStore } from 'vuex'
+﻿import { createStore } from "vuex";
+import filtersModule from "./filters.js";
 
-export default createStore({
-  state: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
+// const counterModule = {
+//   state() {
+//     return {
+//       counter: 0,
+//     };
+//   },
+//   mutations: {
+//     increment(state) {
+//       state.counter++;
+//     },
+//   },
+  
+// };
+
+// Create a new store instance.
+
+const store = createStore({
   modules: {
-  }
-})
+    // numbers: counterModule,
+    filters: filtersModule,
+  },
+  state() {
+    return {};
+  },
+  mutations: {},
+  getters: {},
+});
+
+// https://next.vuex.vuejs.org/guide/getters.html
+
+export default store;
