@@ -7,8 +7,6 @@
       :filter="filter"
     >
     </DropdownFilter>
-
-    <!-- {{filters}} -->
   </div>
 </template>
 

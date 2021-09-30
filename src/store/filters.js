@@ -1,4 +1,4 @@
-﻿import getProducts from "../api/products.js";
+﻿import productsApi from "../api/products.js";
 
 const filters = {
   namespaced: true,
@@ -15,13 +15,16 @@ const filters = {
   },
 
   getters: {
+    // Er det behov for rootState her?
     values(state, getters, rootState) {
       // name under er en funksjon, som de utenfra kan kalle. name kommer fra det kallende stedet.
       return function(name) {
         let filter = state.filters.find(function(f) {
           return f.name === name;
+          // Looper i gjennom filters array, og returnerer det som er likt med parameter name. Hvor kommer parameter name fra?
         });
         return filter ? filter.values : undefined;
+        // Skjønner jeg denne riktig? Hvis filter er true, returneres filter.values, ellers returneres undefined
       };
     },
     filters(state) {
@@ -29,21 +32,31 @@ const filters = {
     },
     queryString(state, getters, rootState) {
       let queries = state.filters
-        .filter(function(f) {
-          return f.values.length;
-        })
+        // SLETTE START
+        // .filter(function(f) {
+        //   return f.values.length;
+        // })
+        // Kan vi oppdatere kommentert kode over til es6 (under)? Funker på samme måte?
+        // SLETTE SLUTT
+        .filter((f) => f.values.length)
+        // Til info: kommer ikke feilmelding, hvis f.values.length ikke funker, skal jeg gjøre noe med det?
         .map(function(f) {
-          // LAGT TIL AV ROGER 28.09 for å få dropdown <select> <option> til å fungere
-          // console.log(f.values);
+          // LAGT TIL AV ROGER 28.09.21 for å få dropdown <select> <option> til å fungere se  eks. console.log(f.values)
           if (!Array.isArray(f.values)) {
-            f.values = [f.values]
+            f.values = [f.values];
           }
-          // SLUTT LAGT TIL AV ROGER
-          return f.values
-            .map(function(v) {
-              return f.name.toLowerCase() + "=" + encodeURI(v);
-            })
-            .join("&");
+          // SLUTT LAGT TIL AV ROGER 28.09.21
+          return (
+            f.values
+              // SLETTE START
+              // .map(function(v) {
+              //   return f.name.toLowerCase() + "=" + encodeURI(v);
+              // })
+              // SLETTE SLUTT
+              .map((v) => f.name.toLowerCase() + "=" + encodeURI(v))
+              // hva brukes encodeURI til her?
+              .join("&")
+          );
         });
       return queries.length ? "?" + queries.join("&") : "";
     },
@@ -51,7 +64,7 @@ const filters = {
 
   actions: {
     init(context) {
-      getProducts.getFilters().then((filters) => {
+      productsApi.getFilters().then((filters) => {
         let urlParams = window.location.search
           .replace("?", "")
           .split("&")

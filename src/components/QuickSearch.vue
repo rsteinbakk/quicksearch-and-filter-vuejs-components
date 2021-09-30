@@ -23,25 +23,35 @@
       "
     />
     <transition name="result">
-      <div class="result" v-if="results">
+      <div class="result" v-if="results && quickSearchResult.length">
         <!-- RESULTATER -->
         <ul
           v-for="(result, index) in quickSearchResult"
           :key="index"
           @click.stop
         >
-          <li class="result-item">
-            <div>
-              <div>{{ result.name }}</div>
-              <div class="result-category">
-                {{ result.category }} 
+          <li>
+            <div class="result-item">
+              <img
+                src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.w3schools.in%2Fdemo%2Fimage_upload_and_generate_thumbnail_using_ajax_in_php%2Fimg%2Fdefault.jpg&f=1&nofb=1"
+                class="result-image"
+                alt=""
+              />
+              <div class="text-price-container">
+                <div>
+                  <div>{{ result.name }}</div>
+                  <div class="result-category">
+                    {{ result.category }}
+                    <small class="in-stock"> på lager</small>
+                  </div>
+                </div>
+                <div class="price">359,-</div>
               </div>
             </div>
-            <div class="price">359,-</div>
           </li>
           <hr />
         </ul>
-        <div class="all-products">
+        <div class="all-search-results">
           <a href="#" v-if="quickSearchResult.length"
             >Vis alle søkeresultater</a
           >
@@ -114,9 +124,10 @@ export default {
           console.error("Error:", error);
         });
     },
+
+    // splitCategories og countReducedCategories vil ikke bli brukt videre
     splitCategories(array) {
       if (array.length) {
-        console.log(array);
         let categoriesArray = [];
         array.forEach((array) => {
           const splittedCat = array.category.split(", ");
@@ -124,13 +135,11 @@ export default {
             categoriesArray.push(category);
           });
         });
-        // console.log(categoriesArray);
         this.countReducedCategories(categoriesArray);
       }
     },
     countReducedCategories(array) {
       if (array.length) {
-        console.log(array);
         const occurrences = array.reduce(function (acc, curr) {
           return acc[curr] ? ++acc[curr] : (acc[curr] = 1), acc;
         }, {});
@@ -143,16 +152,18 @@ export default {
 </script>
 
 <style scoped>
+* {
+  text-align: left;
+  box-sizing: border-box;
+}
 ul {
   all: unset;
 }
 li {
   list-style-type: none;
 }
-
-* {
-  text-align: left;
-  box-sizing: border-box;
+h4 {
+  padding: 0 5px;
 }
 .search-field {
   position: absolute;
@@ -163,8 +174,19 @@ li {
   z-index: 10;
 }
 
+.result-image {
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
+}
 .result-category {
   font-size: 0.8rem;
+}
+.text-price-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 2px;
 }
 
 input[type="text"] {
@@ -191,13 +213,13 @@ input[type="text"] {
   overflow-y: auto;
   padding: 5px;
   background-color: rgb(255, 255, 255);
-  border-radius: 0 0 5px 5px;
+  /* border-radius: 0 0 5px 5px; */
   max-height: 60vh;
 }
 
 .result-item {
   display: flex;
-  justify-content: space-between;
+  justify-content: left;
   cursor: pointer;
   transition: all 0.1s ease;
   padding: 6px 5px;
@@ -221,29 +243,13 @@ ul {
   font-size: 1.2rem;
   margin: 0 5px;
 }
-.all-products {
+.all-search-results {
   font-size: 0.9rem;
-  padding: 5px 0;
+  padding: 15px 5px;
+  cursor: pointer;
 }
-
-/* EFFEKTOVERGANGER */
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-.result-enter-active,
-.result-leave-active {
-  transition: transform 0.3s ease;
-}
-.result-enter-from,
-.result-leave-to {
-  transform: translateY(-100%);
-  opacity: 0;
+.all-search-results:hover {
+  background-color: rgb(235, 235, 235);
 }
 
 .darken {
@@ -255,12 +261,32 @@ ul {
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.37);
 }
-.in-stock {
-  width: 10px;
-  height: 5px;
-  color: green;
-}
 
+/* EFFEKTOVERGANGER */
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.result-enter-active,
+.result-leave-active {
+  transition: transform 0.3s ease;
+  transition: max-height 0.5s ease;
+}
+.result-enter-from {
+  transform: translateY(-100%);
+  opacity: 0;
+  max-height: 30vh;
+}
+.result-leave-to {
+  transform: translateY(-100%);
+  opacity: 0;
+  max-height: 60vh;
+}
 @media only screen and (max-width: 600px) {
 }
 </style>        
