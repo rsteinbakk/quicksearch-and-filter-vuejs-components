@@ -179,16 +179,23 @@ h4 {
   height: 40px;
   margin-right: 8px;
 }
-.result-category {
-  font-size: 0.8rem;
-}
 .text-price-container {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  /* width: 100%; */
   padding: 2px;
 }
+/* .text-price-container > div  {
+  position: relative;
+} */
 
+.result-category {
+  /* text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%; */
+  font-size: 0.8rem;
+}
 input[type="text"] {
   all: unset;
   background-color: white;

@@ -3,7 +3,6 @@
 const filters = {
   namespaced: true,
   // Når man nå kaller den, så kaller man med filters/navnet på den metoden man skal ha
-
   // MUTATION er veldig spesifikk, eks dekrementere antall, endre navn
   /* EN ACTION ER HELE PROSEDYRA (legg i handlekurv) action er serie med mutations */
   // både actions og mutations kan man lytte på. ofte lytter man på actions.
@@ -15,16 +14,10 @@ const filters = {
   },
 
   getters: {
-    // Er det behov for rootState her?
     values(state, getters, rootState) {
-      // name under er en funksjon, som de utenfra kan kalle. name kommer fra det kallende stedet.
       return function(name) {
-        let filter = state.filters.find(function(f) {
-          return f.name === name;
-          // Looper i gjennom filters array, og returnerer det som er likt med parameter name. Hvor kommer parameter name fra?
-        });
+        let filter = state.filters.find((f) => f.name === name);
         return filter ? filter.values : undefined;
-        // Skjønner jeg denne riktig? Hvis filter er true, returneres filter.values, ellers returneres undefined
       };
     },
     filters(state) {
@@ -32,32 +25,12 @@ const filters = {
     },
     queryString(state, getters, rootState) {
       let queries = state.filters
-        // SLETTE START
-        // .filter(function(f) {
-        //   return f.values.length;
-        // })
-        // Kan vi oppdatere kommentert kode over til es6 (under)? Funker på samme måte?
-        // SLETTE SLUTT
         .filter((f) => f.values.length)
-        // Til info: kommer ikke feilmelding, hvis f.values.length ikke funker, skal jeg gjøre noe med det?
-        .map(function(f) {
-          // LAGT TIL AV ROGER 28.09.21 for å få dropdown <select> <option> til å fungere se  eks. console.log(f.values)
-          if (!Array.isArray(f.values)) {
-            f.values = [f.values];
-          }
-          // SLUTT LAGT TIL AV ROGER 28.09.21
-          return (
-            f.values
-              // SLETTE START
-              // .map(function(v) {
-              //   return f.name.toLowerCase() + "=" + encodeURI(v);
-              // })
-              // SLETTE SLUTT
-              .map((v) => f.name.toLowerCase() + "=" + encodeURI(v))
-              // hva brukes encodeURI til her?
-              .join("&")
-          );
-        });
+        .map((f) =>
+          f.values
+            .map((v) => f.name.toLowerCase() + "=" + encodeURI(v))
+            .join("&")
+        );
       return queries.length ? "?" + queries.join("&") : "";
     },
   },
@@ -74,35 +47,34 @@ const filters = {
           });
 
         let newFilters = context.state.filters.slice(0);
-        // console.log(filters.fields);
+        //  newFilters Lager en kopi av filters-arrayet.
 
-        filters.fields.forEach(function(filter) {
-          if (
-            !newFilters.find(function(f) {
-              return f.name === filter.name;
-            })
-          ) {
-            let params = urlParams.filter(function(param) {
-              return param.name.toLowerCase() === filter.name.toLowerCase();
-            });
+        filters.fields.forEach((filter) => {
+          if (!newFilters.find((f) => f.name === filter.name)) {
+            // Hvis det ikke finnes et filter med dette navnet, legges det til.
+            let params = urlParams.filter(
+              // Tar ut alle parameterene som matcher navnet.
+              (param) => param.name.toLowerCase() === filter.name.toLowerCase()
+            );
             newFilters.push({
               name: filter.name,
-              values: params.map(function(param) {
-                return param.value;
-              }),
+              label: filter.label,
               availableValues: filter.availableValues,
+              values: params.map((param) => param.value),
+              // values er de faktisk valgte verdiene (filtrert ut fra urlen)
             });
           }
         });
-
+        // Endringene gjøres på kopi, her blir kopien satt til å bli gjeldende
         context.commit("update", newFilters);
       });
-      // + error-handling
     },
+
+    // Fremtidig mål: Ønsker ikke å overskrive filter her, men sjekke navn og oppdatere eksisterende filter.
 
     set(context, filter) {
       context.commit("set", filter);
-
+      // Hvor kommer history argumentet fra?
       if (history) {
         let url =
           window.location.protocol +
@@ -121,15 +93,14 @@ const filters = {
     },
 
     set(state, filter) {
-      let index = state.filters.findIndex(function(f) {
-        return f.name === filter.name;
-      });
+      let index = state.filters.findIndex((f) => f.name === filter.name);
       if (index >= 0) {
         filter.availableValues = state.filters[index].availableValues;
+        filter.label = state.filters[index].label;
         state.filters.splice(index, 1, filter);
       }
-      //    else
-      //        state.filters.push(filter);
+      // else
+      // state.filters.push(filter);
     },
   },
 };
